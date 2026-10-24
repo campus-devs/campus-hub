@@ -1,0 +1,23 @@
+# Project private files (plans, notes, keys)
+private/*
+
+# Environment variables (never commit real secrets)
+.env
+.env.local
+.env.production
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (for future use when build tools are added)
+node_modules/
+dist/
