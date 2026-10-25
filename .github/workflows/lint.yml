@@ -1,0 +1,93 @@
+name: Lint
+
+# ──────────────────────────────────────────────────────────────────
+# WHEN THIS RUNS:
+#   - On every pull request that targets the main branch.
+#   - On every push to main (catches anything that slips through).
+#
+# WHY LINT ON CI AND NOT JUST LOCALLY:
+#   Relying on contributors to run linters locally before pushing
+#   doesn't work in practice — people forget, or their local config
+#   differs. Running lint in CI makes it a hard gate: a PR with
+#   formatting errors can't be merged. This keeps the codebase
+#   consistent without requiring anyone to police it manually.
+#
+# WHAT THIS WORKFLOW DOES:
+#   1. Checks out the code.
+#   2. Installs Node.js (needed for Prettier and ESLint).
+#   3. Installs the lint tools (no application dependencies yet).
+#   4. Runs Prettier to check formatting (does not auto-fix).
+#   5. Runs ESLint to check for JS errors and style issues.
+#
+# PRETTIER VS ESLINT — what's the difference:
+#   Prettier:  opinionated code *formatter*. It doesn't care about
+#              logic, only about whitespace, line length, quotes, etc.
+#              Running `prettier --check` fails if any file isn't
+#              formatted exactly as Prettier would format it.
+#   ESLint:    *linter* for JavaScript. It catches actual problems:
+#              unused variables, undefined references, unsafe patterns,
+#              and style conventions (like no-var, prefer-const).
+#   They complement each other. Prettier handles formatting so ESLint
+#   doesn't have to (the eslint-config-prettier package turns off
+#   ESLint's formatting rules to avoid conflicts).
+#
+# ADDING A NEW CHECK LATER:
+#   Add a new step after the existing ones. For example, an HTML
+#   validator (html-validate) or a CSS linter (stylelint):
+#
+#     - name: Lint CSS
+#       run: npx stylelint "src/styles/**/*.css"
+# ──────────────────────────────────────────────────────────────────
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel any in-progress run for the same branch/PR when a new commit
+# is pushed. This avoids wasting CI minutes on outdated runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Prettier & ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # actions/checkout clones the repo into the runner's workspace.
+        # @v4 is the current major version — Dependabot will keep this
+        # updated automatically (see .github/dependabot.yml).
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          # node-version: "20" — Node.js 20 is the current LTS release.
+          # LTS (Long-Term Support) versions get security fixes for 3 years.
+          # Don't pin to a patch version (e.g. 20.11.0) — minor/patch
+          # updates are safe and pinning causes unnecessary friction.
+          #
+          # cache: "npm" — caches the npm dependency cache between runs.
+          # This makes subsequent runs faster because npm doesn't have
+          # to re-download packages it already fetched.
+
+      - name: Install dependencies
+        run: npm ci
+        # `npm ci` (clean install) is for CI environments:
+        #   - Reads package-lock.json exactly (reproducible installs)
+        #   - Fails if package.json and package-lock.json are out of sync
+        #   - Never updates package-lock.json
+        # Never use `npm install` in CI — it may update the lockfile and
+        # produce a different dependency tree than what was tested locally.
+
+      - name: Check formatting (Prettier)
+        run: npm run format:check
+
+      - name: Lint JavaScript (ESLint)
+        run: npm run lint

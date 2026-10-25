@@ -32,6 +32,7 @@ You do **not** need years of coding experience or a complex tech stack setup to 
 ### Prerequisites
 
 Before you begin, make sure you have:
+
 1. **A modern web browser**: Google Chrome, Mozilla Firefox, Microsoft Edge, Brave, or Safari.
 2. **A text editor**: We highly recommend [Zed](https://zed.dev/) or [VSCodium](https://vscodium.com/) for its extensions and built-in terminal.
 3. **Git**: Installed on your computer ([Download Git](https://git-scm.com/)).
@@ -41,19 +42,23 @@ Before you begin, make sure you have:
 Follow these quick steps to get a local copy running on your machine:
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/campus-devs/campus-hub.git
    cd campus-hub
    ```
 
 2. **Open the project in VS Codium**:
+
    ```bash
    codium .
    ```
-    for vscode crowd
-    ```bash
-    code .
-    ```
+
+   for vscode crowd
+
+   ```bash
+   code .
+   ```
 
 3. **Launch the web application**:
    - **Option A (Recommended — Live Server Extension)**:

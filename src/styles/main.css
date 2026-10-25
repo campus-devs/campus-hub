@@ -1,0 +1,811 @@
+/*
+  main.css — Campus Hub global stylesheet
+  ========================================
+
+  WHY ONE FILE (for now):
+    A single CSS file is simple to reason about when the project is
+    small. You can read it top to bottom and understand everything.
+    The cost is that it becomes slow to parse as it grows — but that's
+    a problem for a later day, when we know enough about the design to
+    know how to split it sensibly.
+
+  HOW THIS FILE IS ORGANIZED:
+    1. Design Tokens  — CSS custom properties (variables). The single
+                        source of truth for all colors, spacing, and type.
+    2. Reset          — Undo browser defaults so we start from a
+                        consistent baseline.
+    3. Base           — Minimal styles on raw HTML elements (body, h1,
+                        p, a). These apply everywhere without a class.
+    4. Layout         — Structural rules: .page-wrapper, .container.
+    5. Header         — .site-header, .nav-container, .brand.
+    6. Hero           — .hero, .hero-title, .hero-description.
+    7. Footer         — .site-footer, .footer-content.
+    8. Buttons        — .btn, .btn-primary (reused across pages).
+    9. Responsive     — @media queries. Mobile-first: base styles target
+                        small screens, breakpoints add complexity upward.
+
+  HOW THE DARK MODE SYSTEM WORKS:
+    There are two triggers for dark mode:
+      A) The OS-level preference: @media (prefers-color-scheme: dark)
+      B) A manual user toggle: [data-theme="dark"] on <html>
+
+    Both work by re-declaring the same CSS custom properties with
+    different values. The rest of the stylesheet only ever reads those
+    properties — it never hard-codes a color like #4f46e5. That way,
+    switching themes requires changing a single set of variables and
+    every component updates automatically.
+
+    main.js manages the data-theme attribute and writes the user's
+    preference to localStorage so it persists across page loads.
+    See main.js for the JS side of this contract.
+
+  WHAT HAS BEEN REMOVED (and why):
+    - .badge, .badge-dot         — "Coming Soon" badge. Removed with
+                                   the hero variant that used it. Add
+                                   back when needed.
+    - .features-section, -grid,  — Feature cards section. Removed
+      .feature-card, -header,      because the HTML section was removed.
+      -pill, -text                 The styles should return alongside
+                                   the HTML, not before.
+    - .get-involved-section,     — CTA section. Same reason.
+      .get-involved-card
+    - .footer-links, .footer-link — The footer now has a single link,
+      (as a class)                  so the link is styled as a plain <a>
+                                   with base styles. A .footer-links
+                                   group class is only needed once there
+                                   are multiple links to arrange.
+    - .hero-actions              — The hero had two buttons side by side.
+                                   Now it has one. When a second button
+                                   returns, add this back.
+    - .section-tag               — Decorative label above section titles
+                                   ("What we're building"). Not needed
+                                   without section headings.
+    - .btn-secondary             — No secondary button in the HTML yet.
+                                   Dead CSS is a maintenance liability.
+*/
+
+/* ═══════════════════════════════════════════════════════════════════
+   1. DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════════
+
+   Everything visual in this project is derived from these properties.
+   If you want to change the primary color site-wide, change one line
+   here. Nothing else needs to change.
+
+   NAMING CONVENTION:
+     --color-*    colors
+     --space-*    spacing (margin, padding, gap)
+     --font-*     typography
+     --radius-*   border radii
+     --shadow-*   box shadows
+     --transition timing for CSS transitions
+
+   WHY CSS CUSTOM PROPERTIES AND NOT SASS VARIABLES:
+     CSS custom properties (a.k.a. CSS variables) exist at runtime in
+     the browser. You can change them with JavaScript, change them
+     inside media queries, and inherit/override them on child elements.
+     Sass variables are compiled away at build time — you can't change
+     them based on user interaction without a full page rebuild. Since
+     we have no build step, CSS custom properties are the only choice.
+     Even if we add a build step later, custom properties are still
+     better for theming. */
+
+:root {
+  /* ── Colors: light theme ──────────────────────────────────────
+     Indigo (600 → 700) is the brand primary. It has good contrast
+     on both white and the very-light slate background.
+     Slates are used for all text and surfaces — they're a neutral
+     blue-grey that pairs well with indigo without clashing.
+
+     When you add a component with a color that isn't here, add the
+     token first, don't hard-code the hex in the component. */
+
+  --color-primary: #4f46e5; /* Indigo 600 — buttons, links, accents    */
+  --color-primary-hover: #4338ca; /* Indigo 700 — hover state of primary     */
+
+  --color-bg: #f8fafc; /* Slate 50  — page background             */
+  --color-surface: #ffffff; /* White     — cards, header, footer        */
+  --color-border: #e2e8f0; /* Slate 200 — dividers, card borders       */
+
+  --color-text: #0f172a; /* Slate 900 — body text, headings          */
+  --color-text-muted: #475569; /* Slate 600 — secondary/description text   */
+  --color-text-inverse: #ffffff; /* White     — text on dark backgrounds     */
+
+  /* ── Spacing ──────────────────────────────────────────────────
+     Based on a 4px grid. Everything in the layout is a multiple of 4.
+     This isn't enforced by any tooling right now — it's a convention.
+     Following it keeps spacing consistent and makes the UI feel
+     intentional rather than random. */
+
+  --space-xs: 0.25rem; /*  4px */
+  --space-sm: 0.5rem; /*  8px */
+  --space-md: 1rem; /* 16px */
+  --space-lg: 1.5rem; /* 24px */
+  --space-xl: 2rem; /* 32px */
+  --space-2xl: 3rem; /* 48px */
+  --space-3xl: 4rem; /* 64px */
+
+  /* ── Typography ───────────────────────────────────────────────
+     System font stack: uses whatever the user's OS default sans-serif
+     font is. On macOS that's San Francisco, on Windows it's Segoe UI,
+     on most Android it's Roboto. This makes the text feel native and
+     loads instantly — no font file to download.
+
+     When you want a custom font (e.g. Inter), add a @font-face or a
+     <link> to a font CDN in index.html, then update --font-family here.
+     Be careful: fonts are one of the biggest page-load bottlenecks. */
+
+  --font-family:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px — browser default, don't change on <html> */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.5rem; /* 24px */
+  --font-size-2xl: 2rem; /* 32px */
+  --font-size-3xl: 2.5rem; /* 40px */
+
+  --line-height: 1.6; /* comfortable reading line height for body text */
+
+  /* ── Radii ────────────────────────────────────────────────────
+     Consistent border-radius across components.
+     --radius-full is used for pill shapes (badges, toggles). */
+
+  --radius-sm: 0.25rem; /*  4px */
+  --radius-md: 0.5rem; /*  8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-full: 9999px;
+
+  /* ── Shadows ──────────────────────────────────────────────────
+     Three-level shadow scale. Use --shadow-sm for subtle depth
+     (e.g. cards at rest), --shadow-md for interactive elements
+     (e.g. hovered buttons), --shadow-lg sparingly for modals/dropdowns. */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* ── Transitions ──────────────────────────────────────────────
+     One variable for the standard hover animation timing.
+     0.2s is fast enough to feel snappy but slow enough to be
+     perceptible. Don't go below 0.1s or above 0.4s for hover states. */
+
+  --transition: 0.2s ease;
+}
+
+/* ── Dark theme (explicit attribute on <html>) ──────────────────────
+   This block re-declares only the tokens that change between themes.
+   Everything else (spacing, radii, shadows, font) stays the same.
+
+   dark bg: a very dark slate (#0f172a) rather than pure black (#000).
+   Pure black next to coloured elements can cause harsh contrast and
+   make the UI feel flat. Dark slates look more natural.
+
+   primary in dark mode is a lighter indigo (#818cf8) rather than the
+   dark-mode indigo (#4f46e5) because indigo 600 on a dark background
+   often fails contrast checks. Indigo 400 (#818cf8) against the dark
+   surface passes WCAG AA at most sizes. */
+
+[data-theme='dark'] {
+  --color-primary: #818cf8; /* Indigo 400 */
+  --color-primary-hover: #6366f1; /* Indigo 500 */
+
+  --color-bg: #0f172a; /* Slate 900 */
+  --color-surface: #1e293b; /* Slate 800 */
+  --color-border: #334155; /* Slate 700 */
+
+  --color-text: #f1f5f9; /* Slate 100 */
+  --color-text-muted: #94a3b8; /* Slate 400 */
+  --color-text-inverse: #0f172a; /* Slate 900 — used for text on primary bg  */
+}
+
+/* ── Dark theme (OS-level preference, no manual toggle) ─────────────
+   If the user hasn't manually chosen a theme, respect the OS setting.
+   :root:not([data-theme="light"]) means: apply these values whenever
+   the root element does NOT have data-theme="light". It covers both
+   the default state (data-theme="light" set by HTML) and any case
+   where the attribute is missing.
+
+   main.js sets data-theme="light" or "dark" explicitly on load, so
+   in practice this media query only acts before JS has run — a very
+   brief window. It prevents a light-mode flash on OS-dark users. */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-primary: #818cf8;
+    --color-primary-hover: #6366f1;
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+    --color-border: #334155;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-text-inverse: #0f172a;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   2. RESET
+   ═══════════════════════════════════════════════════════════════════
+
+   Browsers apply their own default styles (the "user-agent stylesheet").
+   They're inconsistent across browsers and include things we don't want,
+   like margins on <h1>–<h6>, default button backgrounds, etc.
+
+   This is a minimal modern reset, not a full normalize.css. We only
+   remove things that are actively harmful to our design.
+
+   WHY NOT USE normalize.css OR A FULL RESET:
+     normalize.css preserves useful browser defaults. A full reset like
+     Eric Meyer's zeros everything out, even things like list markers
+     that you might actually want. Our in-between approach zeroes out
+     box-sizing, margin, and padding (the biggest gotchas), and resets
+     a few specific elements. Everything else we handle on a case-by-case
+     basis in the sections below. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* By default, browsers use box-sizing: content-box, which means
+     width and height don't include padding or border. That means
+     adding padding to an element makes it larger, which is almost
+     never what you intend. border-box makes width/height include
+     padding and border, which is far more intuitive. */
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Makes anchor link jumps (e.g. clicking a #section link) animate
+     smoothly instead of teleporting. Can be disabled by users via
+     the 'prefers-reduced-motion' media query — we'll add that
+     override when we have more animated elements. */
+
+  -webkit-text-size-adjust: 100%;
+  /* Prevents iOS Safari from auto-zooming text in landscape mode.
+     Without this, rotated phone screens suddenly have bigger text. */
+}
+
+img,
+svg {
+  display: block;
+  /* Inline images have a small gap below them (they sit on the text
+     baseline). block removes that gap. */
+  max-width: 100%;
+  /* Images never overflow their container. */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   3. BASE STYLES
+   ═══════════════════════════════════════════════════════════════════
+
+   Styles on raw HTML elements — no classes. These are the defaults
+   that everything else inherits from. Keep this section conservative:
+   only add something here if it genuinely applies to every instance
+   of that element across the whole site. */
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+  /*
+    The transitions on body are what makes theme-switching feel smooth
+    instead of a jarring instant swap. When data-theme changes, the
+    background and text colors animate over --transition (0.2s).
+
+    TRADE-OFF: This transition also runs on initial page load, which
+    means there's a 0.2s fade-in on every page visit. Most users won't
+    notice. If it becomes a problem, you can disable the transition on
+    load and enable it after the first DOMContentLoaded. See main.js.
+  */
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  line-height: 1.2;
+  /* Tighter line height for headings. The 1.6 on body would make
+     multi-line headings feel too airy. 1.2 is standard for display text. */
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--font-size-3xl);
+}
+h2 {
+  font-size: var(--font-size-2xl);
+}
+h3 {
+  font-size: var(--font-size-xl);
+}
+
+p {
+  color: var(--color-text-muted);
+  /* Paragraphs are muted by default so they're visually subordinate
+     to headings. Use color: var(--color-text) on a paragraph when you
+     need full contrast, e.g. in a card body that has no heading. */
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  transition: color var(--transition);
+  /*
+    Links are underlined by default for accessibility. The underline
+    ensures they're distinguishable from surrounding text without
+    relying on color alone (important for color-blind users).
+    It's fine to remove underlines on navigation links where the
+    context makes it obvious they're clickable, but do it deliberately,
+    not as a blanket rule.
+  */
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   4. LAYOUT
+   ═══════════════════════════════════════════════════════════════════ */
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /*
+    This is the sticky-footer pattern:
+      1. .page-wrapper fills the full viewport height.
+      2. <main> (below) has flex: 1, so it expands to fill leftover space.
+      3. <footer> always ends up at the bottom, whether the page is
+         long or short.
+
+    min-height: 100vh rather than height: 100vh — height would prevent
+    the page from scrolling past the viewport if the content is taller.
+  */
+}
+
+main {
+  flex: 1;
+  /* flex: 1 is shorthand for flex-grow: 1, flex-shrink: 1,
+     flex-basis: 0%. It means: "take all remaining vertical space."
+     This is the piece that pushes the footer down. */
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--space-lg);
+  /*
+    margin-inline: auto is the modern equivalent of margin-left: auto;
+    margin-right: auto; — it centres the container horizontally.
+
+    padding-inline adds horizontal breathing room on small screens so
+    content doesn't touch the screen edges.
+
+    max-width: 1200px — the readable "column" width. On wide monitors
+    the content doesn't stretch wall-to-wall. This will need to be
+    adjusted as we add a sidebar layout for the feed page.
+
+    Why not use padding: 0 var(--space-lg):
+      padding-inline is logical property — it maps to left/right in
+      LTR languages and right/left in RTL languages. It future-proofs
+      the layout for any RTL language support.
+  */
+}
+
+.section-padding {
+  padding-block: var(--space-3xl);
+  /*
+    A shared utility class for consistent vertical spacing between
+    sections. padding-block is the logical property for
+    padding-top + padding-bottom.
+
+    Using a class keeps vertical rhythm consistent across sections
+    without repeating the same padding values everywhere.
+  */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   5. HEADER
+   ═══════════════════════════════════════════════════════════════════ */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition);
+  /*
+    position: sticky + top: 0 keeps the header visible as you scroll.
+    z-index: 100 puts it above all page content. If you add a modal
+    or dropdown later, give those z-index values above 100.
+
+    The border-bottom is a subtle separator between header and content.
+    It transitions on theme change because --color-border is different
+    in dark mode.
+  */
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 3.5rem;
+  /*
+    Flexbox with space-between puts the brand on the left edge and
+    nav-actions on the right edge. align-items: center vertically
+    centres both within the fixed 3.5rem (56px) height.
+
+    The fixed height prevents the header from resizing if font size
+    changes or if a second line of text appears in the brand tagline.
+    If you ever want the header taller, change this value.
+  */
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+  /*
+    The brand is an <a> tag, so browser default underline is removed.
+    Without text-decoration: none it would look like a normal link.
+
+    flex-direction: column stacks brand-title above brand-tagline.
+    gap: 2px is tighter than our smallest token (--space-xs = 4px)
+    because the title and tagline are visually one unit.
+  */
+}
+
+.brand-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.brand-tagline {
+  font-size: 0.7rem;
+  /*
+    Deliberately not in the token scale — this is a sub-sub-label that
+    should be noticeably smaller than --font-size-sm (14px). 0.7rem ≈ 11px.
+    If you add more tokens to the scale, replace this with one.
+  */
+  color: var(--color-text-muted);
+}
+
+.brand:hover .brand-title {
+  color: var(--color-primary);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  /*
+    A flex row for the right side of the header. Right now it only has
+    the theme toggle. When nav links are added (Login, Feed, Profile),
+    they'll be siblings inside this div.
+  */
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background-color var(--transition);
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  /*
+    :focus-visible shows the focus ring only when the user is navigating
+    with keyboard, not when clicking. This is the modern way to handle
+    focus styles — it avoids the "ugly ring on mouse click" problem
+    without hiding keyboard focus indicators from keyboard users.
+    Never use :focus { outline: none } without a :focus-visible replacement.
+  */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   6. HERO
+   ═══════════════════════════════════════════════════════════════════ */
+
+.hero {
+  text-align: center;
+  /*
+    The hero centres all its text. When we build the feed page, the
+    layout will be left-aligned. The hero is the one place on the site
+    where centred text makes sense — it's a title page, not body copy.
+  */
+}
+
+.hero-content {
+  max-width: 640px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+  /*
+    max-width: 640px constrains the hero text to a comfortable reading
+    width. Long lines of centred text are hard to read. 640px at 16px
+    base is about 60–70 characters per line, which is ideal.
+
+    The flex column with gap replaces individual margin-bottom on each
+    child. This is cleaner: adding or removing a child element doesn't
+    require adjusting margins elsewhere.
+  */
+}
+
+.hero-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  /*
+    800 (extrabold) rather than the default 700 (bold) for display
+    headings. The difference is subtle but gives the title more presence.
+    The CSS spec supports values from 100 to 900 in increments of 100.
+    System fonts usually have 400 (normal) and 700 (bold); for 800 to
+    be distinct you need a font with an extrabold weight. Most system
+    fonts on modern OSes have it.
+  */
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  /*
+    Slightly negative letter-spacing on large display text makes it
+    look more intentional. At body size, negative tracking makes text
+    harder to read. Only do this for headings at large sizes.
+  */
+}
+
+.hero-title-accent {
+  /*
+    Gradient text effect on the word "community".
+    How it works:
+      1. Set a background gradient on the element.
+      2. background-clip: text clips the background to the text shape.
+      3. -webkit-text-fill-color: transparent makes the text itself
+         transparent, so the background gradient shows through.
+
+    This is a widely-supported CSS trick. It degrades gracefully in
+    very old browsers: they simply show the text in the inherited color
+    (var(--color-text)) without the gradient.
+
+    The gradient direction (135deg) is a diagonal — it looks better
+    on short words than horizontal or vertical gradients do.
+  */
+  background: linear-gradient(135deg, var(--color-primary) 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-description {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+  max-width: 480px;
+  /*
+    Slightly narrower than the hero-content max-width. The description
+    is a single paragraph, and a narrower column reads better.
+  */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   7. FOOTER
+   ═══════════════════════════════════════════════════════════════════ */
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-xl);
+  background-color: var(--color-surface);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition);
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  /*
+    space-between puts the copyright text on the left and the GitHub
+    link on the right. On small screens this will look cramped — see
+    the responsive section below for the column fallback.
+  */
+}
+
+.footer-content a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+  /*
+    Footer links are muted, not the primary indigo, because they're
+    secondary navigation. The hover brings them to full text color.
+  */
+}
+
+.footer-content a:hover {
+  color: var(--color-text);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   8. BUTTONS
+   ═══════════════════════════════════════════════════════════════════
+
+   .btn is a base class that sets shared button structure.
+   .btn-primary adds the filled, coloured appearance.
+
+   WHY NOT STYLE THE <button> ELEMENT DIRECTLY:
+     <button> is for interactive controls (submitting forms, triggering
+     actions). <a> is for navigation. We use both with .btn classes
+     because they need to look the same. Styling the element directly
+     would mean the two look different by default.
+
+   NOTE: .btn-secondary is defined here in a comment because we'll need
+   it soon (anywhere we have two CTAs side by side). The pattern:
+
+   .btn-secondary {
+     background: transparent;
+     color: var(--color-primary);
+     border: 1px solid var(--color-primary);
+   }
+   .btn-secondary:hover {
+     background: var(--color-primary);
+     color: var(--color-text-inverse);
+   }
+*/
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
+  /*
+    inline-flex makes the button shrink to content width instead of
+    stretching full-width like a block element.
+
+    The 2px transparent border is a placeholder so that when we add
+    .btn-secondary (which has a visible border), the layout doesn't
+    shift — both variants have the same total box height.
+
+    font-weight: 600 (semibold) makes button labels stand out from
+    body text.
+  */
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  /*
+    A 1px upward nudge on hover gives a subtle "lift" effect that
+    signals interactivity without being loud. It works with box-shadow
+    to create a small shadow "pulling away from the surface" illusion.
+  */
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   9. RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════
+
+   MOBILE-FIRST APPROACH:
+     The base styles above target mobile screens (≤ 767px) by default.
+     The @media blocks below add complexity for larger screens.
+
+   WHY MOBILE-FIRST:
+     - Most visitors (especially college students) will use phones.
+     - Mobile constraints force you to prioritise content over
+       decoration. If something looks good on mobile, it almost always
+       looks good on desktop. The reverse is not true.
+     - CSS is additive: adding rules in media queries is cleaner than
+       undoing rules that were set for desktop.
+
+   BREAKPOINTS:
+     768px  — tablets, landscape phones. 2-column layouts start here.
+     1024px — desktop. More columns, larger text, more whitespace.
+
+     These breakpoints match the common device sizes and are simple to
+     remember. Don't add arbitrary breakpoints for specific devices —
+     let the content tell you when the layout breaks, then add a
+     breakpoint there.
+*/
+
+/* Tablets and above (≥ 768px) */
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: var(--font-size-3xl);
+    /* Same as base for now, but the <br /> tags in the HTML mean
+       "community" is always on its own line. On desktop we might want
+       to remove the <br /> tags and let the text flow naturally at a
+       larger size. For now, leave as is. */
+  }
+}
+
+/* Desktop (≥ 1024px) */
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 3.5rem;
+    /* Larger than --font-size-3xl (2.5rem) on desktop.
+       No token for this — it's a one-off size for the largest heading
+       on the page at the largest viewport. If this value appears more
+       than once, promote it to a token. */
+  }
+
+  .footer-content {
+    /* Already row on desktop (flex defaults). No change needed here.
+       On mobile (below 768px) we'd want column layout — see below. */
+  }
+}
+
+/* Small screens only (< 640px) */
+@media (max-width: 639px) {
+  .footer-content {
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-align: center;
+    /*
+      On small phones, the footer's space-between layout puts text
+      and link at opposite edges of a narrow viewport. Stacking them
+      in a column and centring looks much better.
+
+      This is a max-width query (the exception to mobile-first) because
+      the desktop row layout is the "natural" state and we're correcting
+      it only for very small screens.
+    */
+  }
+}

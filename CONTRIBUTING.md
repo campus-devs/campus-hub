@@ -2,7 +2,7 @@
 
 First of all, **welcome to Campus Hub!** We are thrilled that you are interested in contributing.
 
-Campus Hub is built **by students, for students**. Whether you are a first-year student writing your very first line of code, an experienced developer passionate about helping students, or a designer who loves crafting intuitive user interfaces, you belong here. 
+Campus Hub is built **by students, for students**. Whether you are a first-year student writing your very first line of code, an experienced developer passionate about helping students, or a designer who loves crafting intuitive user interfaces, you belong here.
 
 Contributing to open source can feel intimidating at first, but don't worry — everyone starts somewhere! Our community is welcoming, beginner-friendly, and eager to help you learn and succeed.
 
@@ -36,14 +36,14 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 Not sure where to start? We have curated great entry points:
 
-1. **Browse Issues Tagged [`good first issue`](https://github.com/your-org/campus-hub/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)**:
+1. **Browse Issues Tagged [`good first issue`](https://github.com/campus-devs/campus-hub/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)**:
    These issues are scoped specifically for newcomers — such as fixing styling quirks, adding simple components, or clarifying documentation.
-2. **Check the [Project Board](https://github.com/your-org/campus-hub/projects)**:
+2. **Check the [Project Board](https://github.com/campus-devs/campus-hub/projects)**:
    See what's currently in progress, what's up next for upcoming milestones, and where help is most needed.
 3. **Propose an Idea or Report a Bug**:
    Found something broken? Have a cool idea for campus life? Open an issue using one of our GitHub issue templates.
 4. **Claiming an Issue**:
-   Leave a comment on the issue saying something like: *"Hi! I'd like to work on this issue. Please assign it to me!"* Wait for a maintainer to assign it before you start coding to avoid duplicate effort.
+   Leave a comment on the issue saying something like: _"Hi! I'd like to work on this issue. Please assign it to me!"_ Wait for a maintainer to assign it before you start coding to avoid duplicate effort.
 
 ---
 
@@ -53,7 +53,7 @@ Getting Campus Hub running on your laptop takes just a couple of minutes!
 
 ### 1. Fork and Clone
 
-1. Click the **Fork** button at the top-right of the [campus-hub repository](https://github.com/your-org/campus-hub) to create your own copy on GitHub.
+1. Click the **Fork** button at the top-right of the [campus-hub repository](https://github.com/campus-devs/campus-hub) to create your own copy on GitHub.
 2. Clone your fork to your local machine:
    ```bash
    git clone https://github.com/<your-username>/campus-hub.git
@@ -61,12 +61,13 @@ Getting Campus Hub running on your laptop takes just a couple of minutes!
    ```
 3. Add the original repository as an `upstream` remote so you can stay updated:
    ```bash
-   git remote add upstream https://github.com/your-org/campus-hub.git
+   git remote add upstream https://github.com/campus-devs/campus-hub.git
    ```
 
 ### 2. Open in VS Code
 
 Open the project folder inside your editor:
+
 ```bash
 code .
 ```
@@ -89,15 +90,16 @@ Campus Hub is built using clean, vanilla web technologies (HTML5, modern CSS, an
 
 Keep your Git branch names descriptive and organized. Always create a new branch from `main` instead of working directly on `main`:
 
-| Type | Prefix | Example | Description |
-| :--- | :--- | :--- | :--- |
-| **New Feature** | `feature/` | `feature/dark-mode-toggle` | Introducing a new UI component or capability |
-| **Bug Fix** | `fix/` | `fix/header-mobile-alignment` | Resolving an error, styling glitch, or broken behavior |
-| **Documentation**| `docs/` | `docs/add-setup-troubleshooting` | Updating README, guides, or code comments |
-| **Refactor** | `refactor/` | `refactor/modularize-header-js` | Code cleanup with no functional or visual change |
-| **Styling** | `style/` | `style/card-hover-effects` | Styling, formatting, or CSS polish |
+| Type              | Prefix      | Example                          | Description                                            |
+| :---------------- | :---------- | :------------------------------- | :----------------------------------------------------- |
+| **New Feature**   | `feature/`  | `feature/dark-mode-toggle`       | Introducing a new UI component or capability           |
+| **Bug Fix**       | `fix/`      | `fix/header-mobile-alignment`    | Resolving an error, styling glitch, or broken behavior |
+| **Documentation** | `docs/`     | `docs/add-setup-troubleshooting` | Updating README, guides, or code comments              |
+| **Refactor**      | `refactor/` | `refactor/modularize-header-js`  | Code cleanup with no functional or visual change       |
+| **Styling**       | `style/`    | `style/card-hover-effects`       | Styling, formatting, or CSS polish                     |
 
 To create and switch to a new branch:
+
 ```bash
 git checkout -b feature/short-description
 ```
@@ -127,6 +129,7 @@ git checkout -b feature/short-description
 We follow the **[Conventional Commits](https://www.conventionalcommits.org/)** specification. Writing clear, meaningful commit messages helps our community track changes, generate automatic changelogs, and understand the history of the codebase.
 
 ### Format
+
 ```text
 <type>: <short summary in imperative mood>
 ```
@@ -155,7 +158,7 @@ We follow the **[Conventional Commits](https://www.conventionalcommits.org/)** s
   ```
 
 > [!TIP]
-> Keep the commit message in lowercase, do not put a period at the end of the subject line, and write in the imperative mood (e.g., *"add feature"*, not *"added feature"* or *"adds feature"*).
+> Keep the commit message in lowercase, do not put a period at the end of the subject line, and write in the imperative mood (e.g., _"add feature"_, not _"added feature"_ or _"adds feature"_).
 
 ---
 
@@ -198,6 +201,7 @@ Maintainers and peer reviewers use this checklist when evaluating pull requests.
 Consistent code makes our project easy to read and maintain for everyone. Please adhere to these guidelines:
 
 ### HTML Standards
+
 - Use **semantic HTML5 elements** (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`) rather than generic `<div>` soup.
 - Use **2 spaces** for indentation. No tabs.
 - Always include `alt` attributes on `<img>` tags for accessibility.
@@ -220,6 +224,7 @@ Consistent code makes our project easy to read and maintain for everyone. Please
 ```
 
 ### CSS Standards
+
 - Use **BEM-like (Block-Element-Modifier)** naming conventions for clarity (e.g., `.card`, `.card__header`, `.card--highlighted`).
 - Use **CSS Custom Properties (Variables)** for colors, fonts, spacing, and border radii. Avoid hardcoding hex colors across multiple files:
   ```css
@@ -239,6 +244,7 @@ Consistent code makes our project easy to read and maintain for everyone. Please
 - Write mobile-first media queries (`@media (min-width: 768px)`).
 
 ### JavaScript Standards
+
 - Write modern **vanilla JavaScript using ES Modules** (`import` / `export`).
 - Use **`camelCase`** for variable and function names (e.g., `fetchPostList`, `userProfileData`).
 - Use **`UPPER_SNAKE_CASE`** for top-level constants (e.g., `MAX_COMMENT_LENGTH = 500`).
@@ -248,8 +254,8 @@ Consistent code makes our project easy to read and maintain for everyone. Please
 
 ```javascript
 // Good: Safe rendering
-const postTitleElement = document.createElement('h3');
-postTitleElement.textContent = post.title;
+const postTitleElement = document.createElement('h3')
+postTitleElement.textContent = post.title
 
 // BAD: Dangerous XSS hazard!
 // postCard.innerHTML = `<h3>${post.title}</h3>`;
