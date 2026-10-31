@@ -1,0 +1,61 @@
+# .github/dependabot.yml
+#
+# Dependabot opens automated PRs when dependencies have updates or
+# known security vulnerabilities. We keep it enabled for two reasons:
+#
+#   1. SECURITY: A free-tier project can't afford to manually track
+#      CVEs across dozens of transitive dependencies. Dependabot does
+#      it automatically and opens a PR the moment a fix is available.
+#
+#   2. LEARNING: Every Dependabot PR is a mini code review exercise.
+#      Contributors learn to read changelogs, understand semver
+#      (major.minor.patch), spot breaking changes, and decide whether
+#      to merge or hold. That's a real skill used in every software job.
+#
+# HOW TO HANDLE A DEPENDABOT PR:
+#   1. Read the PR description — Dependabot links to the changelog.
+#   2. Check the version bump: patch (1.0.x) = safe, minor (1.x.0) =
+#      usually safe, major (x.0.0) = read the migration guide.
+#   3. Check if CI passes (the lint workflow runs automatically).
+#   4. If CI is green and the change looks safe, approve and merge.
+#   5. If something breaks, close the PR and open an issue to track it.
+#
+# We track two ecosystems:
+
+version: 2
+updates:
+  # ── npm (our dev tools: ESLint, Prettier) ───────────────────────────
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Kolkata'
+    # Group all npm updates into a single PR per week instead of one PR
+    # per package. Less noise, easier to review.
+    groups:
+      dev-dependencies:
+        dependency-type: 'development'
+    open-pull-requests-limit: 3
+    labels:
+      - 'dependencies'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+
+  # ── GitHub Actions (the versions in lint.yml) ────────────────────────
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Kolkata'
+    open-pull-requests-limit: 3
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'

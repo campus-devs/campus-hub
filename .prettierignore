@@ -1,0 +1,14 @@
+# .prettierignore — files Prettier should not touch
+#
+# Same syntax as .gitignore.
+# Add files here that are auto-generated, vendored, or have formatting
+# that Prettier would destroy (e.g. intentionally aligned columns).
+
+# Generated
+package-lock.json
+
+# Vendored / third-party (none yet, but when we pin a CDN library locally)
+# src/vendor/
+
+# Private notes (not committed, but in case someone has them locally)
+private/

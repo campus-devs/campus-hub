@@ -1,0 +1,323 @@
+<!doctype html>
+<!--
+  index.html — the only HTML file this project has right now.
+
+  Why this file lives at the repo root (not in src/):
+    GitHub Pages, when configured to serve from the root of the main
+    branch, looks for index.html here. If you put it anywhere else you
+    need to configure a custom Pages workflow or a redirect. Keeping it
+    here is the simplest thing that works.
+
+  The relationship between this file and the rest of the project:
+    - This file pulls in ./src/styles/main.css for all visual styles.
+    - This file pulls in ./src/main.js as an ES module for behaviour.
+    - As the app grows, main.js will import other JS modules from src/.
+    - HTML files for other "pages" (login, feed, profile) will sit in
+      src/ or at the root — we'll decide that when we get there.
+
+  Path rule — the single most common early bug on GitHub Pages:
+    Always write relative paths: ./src/styles/main.css
+    Never write absolute paths: /src/styles/main.css
+
+    The site is served from https://<org>.github.io/campus-hub/.
+    A leading / makes the browser look at https://<org>.github.io/src/...,
+    which doesn't exist. You'll get a 404 for your CSS and JS while
+    the HTML loads fine, which is very confusing to debug.
+-->
+<html lang="en" data-theme="light">
+  <!--
+  data-theme="light" is set here so the page never flashes the wrong
+  theme on load. main.js reads localStorage and may immediately change
+  this attribute before the first paint. Setting it here means the
+  CSS default (light) applies for the brief moment before JS runs.
+
+  If you want to do a server-side render later you'd set this from
+  a cookie instead. For now, a static default is fine.
+
+  lang="en": tells screen readers and search engines the page language.
+  Update if the site ever supports other languages.
+-->
+
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+    charset must be the very first tag inside <head>. If the browser
+    hasn't parsed the charset before it hits text, it can misread
+    multi-byte characters (Hindi, emoji, etc.). UTF-8 covers all of them.
+  -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+    Without this tag, mobile browsers render the page at ~980px wide
+    (the old desktop width) and then zoom out, making everything tiny.
+    "width=device-width" tells the browser to use the actual screen
+    width. "initial-scale=1.0" prevents any default zoom.
+  -->
+
+    <meta
+      name="description"
+      content="Campus Hub — A campus-only community platform built in the open by students, for students."
+    />
+    <!--
+    The description appears under the page title in Google results and
+    in link previews on WhatsApp / Telegram. Keep it under ~155 chars.
+    Update this as the product evolves.
+  -->
+
+    <!--
+    Open Graph tags — used by Facebook, LinkedIn, Discord, Slack, and
+    most chat apps when someone pastes a link. Without these, the
+    preview is whatever the crawler happens to scrape, which looks bad.
+
+    og:image is intentionally missing until we have a real image to show.
+    When you add one, the recommended size is 1200×630px.
+  -->
+    <meta property="og:title" content="Campus Hub" />
+    <meta property="og:description" content="Your campus, your community, your voice." />
+    <meta property="og:type" content="website" />
+
+    <title>Campus Hub</title>
+    <!--
+    <title> is what shows in the browser tab and in search results.
+    On pages other than the home page, the convention is:
+      "Page Name — Campus Hub"
+    e.g. "Login — Campus Hub" or "CSE Community — Campus Hub"
+  -->
+
+    <link rel="stylesheet" href="./src/styles/main.css" />
+    <!--
+    One CSS file for now. When the project grows we'll probably split
+    this into a base/reset file and per-component files. The <link>
+    here would stay the same if we eventually bundle them.
+
+    No <link rel="preload"> yet — that's an optimisation worth adding
+    once the CSS file is large enough to matter.
+  --></head>
+
+  <body>
+    <!--
+  .page-wrapper exists for one reason: sticky footer.
+
+  The pattern is:
+    .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+    main           { flex: 1; }
+
+  This makes <main> expand to fill all available vertical space,
+  pushing <footer> to the bottom of the viewport even when the page
+  content is short. Without it, the footer floats up on sparse pages.
+-->
+    <div class="page-wrapper">
+      <!--
+    HEADER
+    ======
+    Right now the header has: a brand name on the left, a theme toggle
+    on the right. That's it.
+
+    What goes here eventually:
+      - A real logo/favicon (favicon lives in the <head>, not here)
+      - Navigation links: Feed, Communities, Profile, Login
+      - A notification bell (once auth and notifications exist)
+      - A search bar (once search exists — Postgres full-text search,
+        see the roadmap)
+      - A mobile hamburger menu that collapses the nav links
+
+    Why <header> instead of <div class="header">:
+      <header> is a semantic landmark element. Screen readers announce
+      it as a "banner" region, and search engine crawlers know it's
+      the site header. Semantics matter for accessibility.
+
+    Why position: sticky (set in CSS):
+      The header stays visible as you scroll. This is standard for
+      nav-heavy apps. If it becomes annoying on mobile, you can change
+      to position: fixed with a top-padding on <body>, or remove sticky
+      entirely for a "disappears on scroll" effect.
+  -->
+      <header class="site-header">
+        <div class="container nav-container">
+          <!--
+        The brand is an <a> tag pointing to "./" so clicking it always
+        takes you back to the home page. Using an <a> instead of a <div>
+        means it's keyboard-focusable and screen-reader-friendly by default.
+
+        aria-label explains to screen readers that this is the home link,
+        not just a text node that says "🎓 Campus Hub".
+      -->
+          <a href="./" class="brand" aria-label="Campus Hub home page">
+            <span class="brand-title">🎓 Campus Hub</span>
+            <span class="brand-tagline">Your campus, your community</span>
+          </a>
+
+          <div class="nav-actions">
+            <!--
+          Theme toggle button.
+
+          Why a <button> and not a checkbox or a link:
+            - <button> is the correct element for an action that changes
+              application state. A checkbox implies a persistent setting
+              that's visible in a form; a link implies navigation.
+            - <button> is focusable and activatable via keyboard (Enter
+              and Space) with zero extra work.
+
+          aria-label="Toggle dark mode" describes the *action*, not the
+          current state. For a more accessible implementation later, you
+          could use aria-pressed="true/false" to announce current state
+          to screen readers.
+
+          The JS in main.js listens for a click on id="theme-toggle"
+          and calls applyTheme(). The icon inside updates to match.
+        -->
+            <button
+              id="theme-toggle"
+              class="theme-toggle-btn"
+              aria-label="Toggle dark mode"
+              title="Toggle dark mode"
+            >
+              <span id="theme-icon">🌙</span>
+              <span>Theme</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <!--
+      HERO SECTION
+      ============
+      The hero is the first thing a visitor sees. Right now it shows:
+        - The project name / tagline
+        - A one-line description
+        - A link to the GitHub repo
+
+      What this section is NOT yet:
+        - It has no illustration, no animation, no gradient background.
+          Those are things to add once the copy and layout feel right.
+        - It has no call-to-action for "sign up" because auth doesn't
+          exist yet (that's Week 3–4 of the roadmap).
+        - It has no screenshot or demo because there's nothing to show.
+
+      Why <section> and not <div>:
+        <section> groups thematically related content and shows up as a
+        landmark in accessibility trees. Every <section> should ideally
+        have a heading — this one has the <h1>.
+
+      Why only one <h1> per page:
+        Screen readers use headings to navigate pages. A page should
+        have one <h1> (the primary topic), then <h2> for sections, <h3>
+        for subsections. Having two <h1> tags is an accessibility error.
+    -->
+        <section class="hero section-padding">
+          <div class="container hero-content">
+            <h1 class="hero-title">
+              Your campus,<br />
+              your <span class="hero-title-accent">community</span>,<br />
+              your voice.
+            </h1>
+            <!--
+          hero-title-accent applies a gradient fill to the word
+          "community" in CSS. See main.css for how this is done with
+          background-clip: text. It's a purely decorative effect and
+          degrades gracefully in older browsers.
+        -->
+
+            <p class="hero-description">
+              A campus-only community platform built in the open by students, for
+              students.
+            </p>
+
+            <a
+              href="https://github.com/campus-devs/campus-hub"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary"
+            >
+              View on GitHub
+            </a>
+            <!--
+          target="_blank" opens the link in a new tab.
+          rel="noopener noreferrer" is a security requirement any time
+          you use target="_blank". Without it, the new tab gets a
+          reference to this tab via window.opener, which a malicious
+          site could use to redirect this tab. noopener removes that
+          reference. noreferrer additionally hides the HTTP referrer.
+
+          Use target="_blank" only for links leaving the site.
+          Internal links should navigate in the same tab.
+        -->
+
+            <!--
+          REMOVED: "Get Involved" CTA button that linked to #get-involved.
+          That section doesn't exist anymore. Adding a dead anchor link
+          is worse than removing the button — the scroll would land
+          nowhere and feel broken. Add the button back when the section
+          is written.
+
+          REMOVED: features section (four feature cards).
+          Reason: showing a grid of planned features on a "coming soon"
+          page signals what we *want* to build, not what exists. That
+          creates an implicit promise. If any of those features change
+          in scope or are cut, the landing page becomes misleading.
+          Start minimal. Add real features to the landing page when they
+          actually exist.
+
+          REMOVED: "Get Involved" / CTA section.
+          Reason: the GitHub link in the hero already covers this.
+          A second CTA section for an app with no users is noise.
+          It can come back once we have something concrete to invite
+          people to (e.g. beta sign-up form, Discord server).
+        -->
+          </div>
+        </section>
+      </main>
+
+      <!--
+    FOOTER
+    ======
+    Right now: MIT license attribution and a GitHub link.
+
+    What goes here eventually:
+      - Links to: Terms of Service, Privacy Policy (required before
+        collecting any student data), Code of Conduct
+      - "Made by students at [College Name]" attribution
+      - Possibly: link to the Discord server
+
+    Why not add those links now:
+      The ToS and Privacy Policy don't exist yet. Linking to a 404
+      is worse than no link. Add links as documents get written.
+  -->
+      <footer class="site-footer">
+        <div class="container footer-content">
+          <p>Built with ❤️ by students &middot; MIT License</p>
+          <a
+            href="https://github.com/campus-devs/campus-hub"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-link"
+          >
+            GitHub →
+          </a>
+        </div>
+      </footer>
+    </div>
+    <!-- /.page-wrapper -->
+
+    <script type="module" src="./src/main.js"></script>
+    <!--
+  type="module" does several things:
+    1. Enables import/export syntax inside main.js without a bundler.
+    2. Makes the script DEFERRED by default — it runs after the HTML
+       is fully parsed, so no need for DOMContentLoaded workarounds
+       (though we still use it in main.js for explicitness).
+    3. Runs in strict mode automatically.
+    4. Scopes all variables to the module — no accidental globals.
+
+  One side effect: modules only run once per page even if the same
+  file is included via <script> twice. That's almost always the
+  behaviour you want.
+
+  For now there is one script file. When the app grows:
+    - Auth logic will go in ./src/api/auth.js and be imported by main.js
+    - UI components will go in ./src/components/
+    - The HTML for the feed page will have its own entry-point script
+-->
+  </body>
+</html>
