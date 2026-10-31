@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         # actions/checkout clones the repo into the runner's workspace.
         # @v4 is the current major version — Dependabot will keep this
         # updated automatically (see .github/dependabot.yml).
