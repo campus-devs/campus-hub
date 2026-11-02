@@ -28,11 +28,10 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
-      day: 'monday'
+      interval: 'monthly'
       time: '09:00'
       timezone: 'Asia/Kolkata'
-    # Group all npm updates into a single PR per week instead of one PR
+    # Group all npm updates into a single PR per month instead of one PR
     # per package. Less noise, easier to review.
     groups:
       dev-dependencies:
@@ -48,10 +47,14 @@ updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'weekly'
-      day: 'monday'
+      interval: 'monthly'
       time: '09:00'
       timezone: 'Asia/Kolkata'
+    # Group all action updates into a single monthly PR.
+    groups:
+      actions:
+        patterns:
+          - '*'
     open-pull-requests-limit: 3
     labels:
       - 'dependencies'
