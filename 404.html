@@ -1,0 +1,81 @@
+<!doctype html>
+<!--
+  404.html - custom error page that will be in main root of the repository 
+-->
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Campus Hub — A campus-only community platform built in the open by students, for students."
+    />
+    <meta property="og:title" content="Campus Hub" />
+    <meta property="og:description" content="Your campus, your community, your voice." />
+    <meta property="og:type" content="website" />
+
+    <title>Campus Hub</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+
+  <body>
+    <div class="page-wrapper">
+      <header class="site-header">
+        <div class="container nav-container">
+          <a href="./" class="brand" aria-label="Campus Hub home page">
+            <span class="brand-title">🎓 Campus Hub</span>
+            <span class="brand-tagline">Your campus, your community</span>
+          </a>
+
+          <div class="nav-actions">
+            <button
+              id="theme-toggle"
+              class="theme-toggle-btn"
+              aria-label="Toggle dark mode"
+              title="Toggle dark mode"
+            >
+              <span id="theme-icon">🌙</span>
+              <span>Theme</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero section-padding">
+          <div class="container hero-content">
+            <h1 class="hero-title">
+              404<br />
+              <span class="hero-title-accent">page not found</span><br />
+            </h1>
+            <p class="hero-description"></p>
+            <a
+              href="https://campus-devs.github.io/campus-hub/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-primary"
+            >
+              Go to main page
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="container footer-content">
+          <p>Built with ❤️ by students &middot; MIT License</p>
+          <a
+            href="https://github.com/campus-devs/campus-hub"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-link"
+          >
+            GitHub →
+          </a>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
