@@ -95,7 +95,7 @@ campus-hub/
 ├── CODE_OF_CONDUCT.md            # Community behavior standards
 ├── CONTRIBUTING.md               # Guide for new contributors
 ├── index.html                    # Main application landing page & entry
-├── LICENSE                       # MIT Open Source License
+├── LICENSE                       # GPLA Open Source License
 ├── README.md                     # Project documentation & overview
 └── SECURITY.md                   # Vulnerability reporting and security policy
 ```
