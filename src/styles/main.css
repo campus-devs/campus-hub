@@ -740,7 +740,44 @@ main {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   9. RESPONSIVE
+   9. ERROR / 404 PAGE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.error-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.error-hero {
+  margin-block: auto;
+  width: 100%;
+}
+
+.error-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.error-code {
+  font-size: clamp(5rem, 14vw, 8.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--color-text);
+}
+
+.error-subtitle {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   10. RESPONSIVE
    ═══════════════════════════════════════════════════════════════════
 
    MOBILE-FIRST APPROACH:
