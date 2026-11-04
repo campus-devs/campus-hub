@@ -831,6 +831,10 @@ main {
 
 /* Small screens only (< 640px) */
 @media (max-width: 639px) {
+  .hero-title {
+    font-size: var(--font-size-2xl);
+  }
+
   .footer-content {
     flex-direction: column;
     gap: var(--space-sm);
